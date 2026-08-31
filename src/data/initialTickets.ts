@@ -1,0 +1,81 @@
+import { Ticket } from '../types';
+
+export const INITIAL_TICKETS: Ticket[] = [
+  {
+    id: 'KAN-101',
+    platform: 'JIRA',
+    title: 'VPN connection timing out on home mesh network',
+    description: 'User reports GlobalProtect disconnects every 15 minutes when connected to eero mesh Wi-Fi.',
+    status: 'In Progress',
+    priority: 'Medium',
+    category: 'VPN & Network',
+    createdBy: 'alex.chen@corp.internal',
+    createdByName: 'Alex Chen',
+    assignedTo: 'elena.rostova@corp.internal',
+    createdAt: '2026-08-24T09:15:00Z',
+    updatedAt: '2026-08-25T08:30:00Z',
+    conversationId: 'conv-8812',
+    metadata: { environment: 'macOS 15.1', clientVersion: '6.2.1' }
+  },
+  {
+    id: 'INC0089211',
+    platform: 'ServiceNow',
+    title: 'AWS Production ReadOnly access request for incident triage',
+    description: 'Emergency access request to investigate latency spikes on RDS cluster.',
+    status: 'Pending Approval',
+    priority: 'High',
+    category: 'Identity & Access',
+    createdBy: 'priya.sharma@corp.internal',
+    createdByName: 'Priya Sharma',
+    approverId: 'marcus.vance@corp.internal',
+    createdAt: '2026-08-25T11:00:00Z',
+    updatedAt: '2026-08-25T11:05:00Z',
+    conversationId: 'conv-8813',
+    metadata: { targetResource: 'AWS_PROD_READONLY', justification: 'RDS Latency Incident Sev-2' }
+  },
+  {
+    id: 'KAN-102',
+    platform: 'JIRA',
+    title: 'Flickering 4K external display via CalDigit TS4 dock',
+    description: 'External monitor blinks black repeatedly when playing video or sharing screen on Zoom.',
+    status: 'Open',
+    priority: 'Low',
+    category: 'Hardware & Peripherals',
+    createdBy: 'alex.chen@corp.internal',
+    createdByName: 'Alex Chen',
+    assignedTo: 'elena.rostova@corp.internal',
+    createdAt: '2026-08-23T14:20:00Z',
+    updatedAt: '2026-08-24T10:00:00Z',
+    metadata: { hardwareModel: 'MacBook Pro M3 Max' }
+  },
+  {
+    id: 'INC0089190',
+    platform: 'ServiceNow',
+    title: 'Active Directory account lockout after mobile phone password update',
+    description: 'Account locked due to cached Exchange ActiveSync credentials on secondary device.',
+    status: 'Resolved',
+    priority: 'High',
+    category: 'Identity & Access',
+    createdBy: 'david.kim@corp.internal',
+    createdByName: 'David Kim',
+    assignedTo: 'HelpDeskGenie-Automated',
+    createdAt: '2026-08-24T16:00:00Z',
+    updatedAt: '2026-08-24T16:03:12Z',
+    resolutionNotes: 'Self-service account unlock completed via HelpDeskGenie with Twilio OTP verification.'
+  },
+  {
+    id: 'KAN-103',
+    platform: 'JIRA',
+    title: 'Request Figma Enterprise seat and design tokens repository access',
+    description: 'Product designer onboarding ticket for design system repository access.',
+    status: 'Closed',
+    priority: 'Medium',
+    category: 'Software & Tools',
+    createdBy: 'priya.sharma@corp.internal',
+    createdByName: 'Priya Sharma',
+    assignedTo: 'design-ops@corp.internal',
+    createdAt: '2026-08-20T10:10:00Z',
+    updatedAt: '2026-08-21T15:45:00Z',
+    resolutionNotes: 'Provisioned via Okta group sync.'
+  }
+];
