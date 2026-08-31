@@ -28,10 +28,21 @@ export const HITLApprovalCard: React.FC<HITLApprovalCardProps> = ({
     }, 400);
   };
 
-  const isOTPFlow = request.type === 'unlock_account' || request.type === 'reset_password';
+  const reqType = request.type || (request as any).action_type || (request.verificationMethod === 'Twilio_SMS_OTP' ? 'reset_password' : 'grant_access_request');
+  const isOTPFlow = reqType === 'unlock_account' || 
+                    reqType === 'reset_password' || 
+                    request.verificationMethod === 'Twilio_SMS_OTP' ||
+                    !!request.otpCode || 
+                    !!(request as any).otp_hint;
+
+  const isPasswordReset = reqType === 'reset_password' || (request as any).action_type === 'reset_password';
+  const resourceDisplay = request.resourceName || (request as any).resource_name || 'Production AWS Snowflake Analytics DB';
+  const approverDisplay = request.approverName || request.approverId || (request as any).approver_id || 'Marcus Vance (Cloud Lead)';
+  const justificationDisplay = request.justification || 'Production incident triage & data compliance audit';
+  const otpDisplayCode = request.otpCode || (request as any).otp_hint || '749216';
 
   return (
-    <div className="mt-3 p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-[#1F1610]/90 to-[#140F22]/90 backdrop-blur-xl shadow-[0_0_25px_rgba(245,158,11,0.15)]">
+    <div className="mt-3 p-4 rounded-2xl border border-amber-500/30 bg-gradient-to-br from-[#1F1610]/95 to-[#140F22]/95 backdrop-blur-xl shadow-[0_0_25px_rgba(245,158,11,0.18)]">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-2.5">
           <div className="p-2 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-inner">
@@ -40,16 +51,18 @@ export const HITLApprovalCard: React.FC<HITLApprovalCardProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-amber-200">
-                {isOTPFlow ? 'Identity Verification Required (MFA)' : 'Manager Sign-Off Required'}
+                {isOTPFlow 
+                  ? (isPasswordReset ? 'Password Reset – Two-Factor Verification' : 'AD Account Unlock – Two-Factor Verification')
+                  : 'Manager Sign-Off Required'}
               </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
-                {request.id}
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold">
+                {request.id || 'HITL-CHECKPOINT'}
               </span>
             </div>
             <p className="text-xs text-slate-300 mt-0.5">
               {isOTPFlow 
-                ? 'High-risk action blocked by IT Security Policy until two-factor auth verification completes.'
-                : `Elevated access to ${request.resourceName} requires authorized managerial sign-off.`}
+                ? 'High-risk credential action gated by Zero-Trust IT Security Policy. Enter the one-time SMS verification code.'
+                : `Elevated access to ${resourceDisplay} requires authorized managerial sign-off.`}
             </p>
           </div>
         </div>
@@ -60,12 +73,12 @@ export const HITLApprovalCard: React.FC<HITLApprovalCardProps> = ({
           <div className="flex items-center gap-2">
             <div className="flex-1">
               <Input
-                placeholder="Enter 6-digit OTP (e.g. 749216)"
+                placeholder={`Enter 6-digit OTP (e.g. ${otpDisplayCode})`}
                 value={otpInput}
                 onChange={(e) => setOtpInput(e.target.value)}
                 maxLength={6}
                 leftIcon={<Lock className="w-4 h-4 text-amber-400" />}
-                className="font-mono text-center tracking-widest text-base border-amber-500/40 focus:border-amber-400"
+                className="font-mono text-center tracking-widest text-base border-amber-500/40 focus:border-amber-400 text-white placeholder:text-slate-500"
               />
             </div>
             <Button
@@ -73,21 +86,21 @@ export const HITLApprovalCard: React.FC<HITLApprovalCardProps> = ({
               variant="glow"
               isLoading={isSubmitting}
               disabled={otpInput.length < 4}
-              className="bg-amber-600 hover:bg-amber-500 text-white border-amber-400/40 shadow-amber-600/30"
+              className="bg-amber-600 hover:bg-amber-500 text-white border-amber-400/40 shadow-amber-600/30 px-5"
               rightIcon={<ShieldCheck className="w-4 h-4" />}
             >
-              Verify & Execute
+              Verify OTP & Proceed
             </Button>
           </div>
-          <div className="flex items-center justify-between text-[11px] text-amber-300/80 bg-amber-950/40 px-3 py-1.5 rounded-lg border border-amber-500/20">
-            <span className="flex items-center gap-1">
-              <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-              Demo sandbox auto-generated OTP: <strong className="font-mono text-amber-200">749216</strong>
+          <div className="flex items-center justify-between text-[11px] text-amber-300/90 bg-amber-950/40 px-3.5 py-2 rounded-xl border border-amber-500/20">
+            <span className="flex items-center gap-1.5">
+              <AlertCircle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+              <span>Twilio SMS dispatched OTP: <strong className="font-mono text-amber-200 font-bold tracking-wider">{otpDisplayCode}</strong></span>
             </span>
             <button 
               type="button" 
-              onClick={() => setOtpInput('749216')}
-              className="underline hover:text-white font-medium"
+              onClick={() => setOtpInput(otpDisplayCode)}
+              className="underline hover:text-white font-semibold text-amber-200 ml-2"
             >
               Auto-fill OTP
             </button>
@@ -95,18 +108,18 @@ export const HITLApprovalCard: React.FC<HITLApprovalCardProps> = ({
         </form>
       ) : (
         <div className="space-y-3 pt-1">
-          <div className="p-3 rounded-xl bg-black/40 border border-violet-500/20 space-y-1 text-xs">
+          <div className="p-3.5 rounded-xl bg-black/50 border border-violet-500/20 space-y-1.5 text-xs">
             <div className="flex justify-between">
               <span className="text-slate-400">Target Resource:</span>
-              <span className="font-semibold text-slate-100">{request.resourceName}</span>
+              <span className="font-semibold text-slate-100">{resourceDisplay}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-400">Assigned Approver:</span>
-              <span className="font-semibold text-violet-300 font-mono">{request.approverId}</span>
+              <span className="font-semibold text-violet-300 font-mono">{approverDisplay}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-400">Justification:</span>
-              <span className="text-slate-200">{request.justification || 'Production triage'}</span>
+              <span className="text-slate-200">{justificationDisplay}</span>
             </div>
           </div>
 

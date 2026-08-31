@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import time
 import base64
@@ -29,8 +29,10 @@ USERS_DB = {
         "role": "employee",
         "department": "Frontend Engineering",
         "manager": "sarah.jenkins@corp.internal",
+        "mobile": "+1 (555) 349-8812",
         "is_locked": False,
-        "auth_source": "AD_LDAP"
+        "auth_source": "AD_LDAP",
+        "status": "active"
     },
     "david.kim@corp.internal": {
         "id": "USR-1002",
@@ -39,8 +41,22 @@ USERS_DB = {
         "role": "employee",
         "department": "Backend Platform",
         "manager": "marcus.vance@corp.internal",
+        "mobile": "+1 (555) 912-4421",
         "is_locked": True,
-        "auth_source": "AD_LDAP"
+        "auth_source": "AD_LDAP",
+        "status": "active"
+    },
+    "priya.sharma@corp.internal": {
+        "id": "USR-1003",
+        "email": "priya.sharma@corp.internal",
+        "name": "Priya Sharma",
+        "role": "employee",
+        "department": "Product Management",
+        "manager": "sarah.jenkins@corp.internal",
+        "mobile": "+1 (555) 441-2099",
+        "is_locked": False,
+        "auth_source": "AD_LDAP",
+        "status": "active"
     },
     "elena.rostova@corp.internal": {
         "id": "AGT-2001",
@@ -49,8 +65,10 @@ USERS_DB = {
         "role": "agent",
         "department": "Tier 2 IT Service Desk",
         "manager": "sarah.jenkins@corp.internal",
+        "mobile": "+1 (555) 883-1120",
         "is_locked": False,
-        "auth_source": "ADMIN_INVITE"
+        "auth_source": "ADMIN_INVITE",
+        "status": "active"
     },
     "marcus.vance@corp.internal": {
         "id": "APR-3001",
@@ -59,8 +77,10 @@ USERS_DB = {
         "role": "approver",
         "department": "Engineering Director / IT Approver",
         "manager": "vp-eng@corp.internal",
+        "mobile": "+1 (555) 777-9090",
         "is_locked": False,
-        "auth_source": "ADMIN_INVITE"
+        "auth_source": "ADMIN_INVITE",
+        "status": "active"
     },
     "admin@corp.internal": {
         "id": "ADM-0001",
@@ -69,12 +89,32 @@ USERS_DB = {
         "role": "it_admin",
         "department": "IT Infrastructure & Security",
         "manager": "cio@corp.internal",
+        "mobile": "+1 (555) 101-2020",
         "is_locked": False,
-        "auth_source": "ADMIN_INVITE"
+        "auth_source": "ADMIN_INVITE",
+        "status": "active"
     }
 }
 
 INVITES_DB = []
+
+PENDING_HITL_DB: Dict[str, Dict[str, Any]] = {
+    "HITL-88219": {
+        "id": "HITL-88219",
+        "type": "grant_access_request",
+        "action_type": "grant_access_request",
+        "userId": "alex.chen@corp.internal",
+        "userName": "Alex Chen",
+        "resourceName": "Production AWS Snowflake Analytics DB",
+        "approverId": "marcus.vance@corp.internal",
+        "approverName": "Marcus Vance (Cloud Lead)",
+        "status": "pending_approval",
+        "verificationMethod": "Manager_Signoff",
+        "justification": "Quarterly compliance telemetry audit and pipeline diagnostics",
+        "requestedAt": "2026-08-30T14:00:00Z",
+        "ticketId": "KAN-104"
+    }
+}
 
 TICKETS_DB = [
     {
@@ -86,8 +126,10 @@ TICKETS_DB = [
         "priority": "Medium",
         "category": "VPN & Network",
         "createdBy": "alex.chen@corp.internal",
+        "createdByName": "Alex Chen",
         "assignedTo": "elena.rostova@corp.internal",
-        "createdAt": "2026-08-24T09:15:00Z"
+        "createdAt": "2026-08-24T09:15:00Z",
+        "updatedAt": "2026-08-24T09:30:00Z"
     },
     {
         "id": "INC0089211",
@@ -98,10 +140,28 @@ TICKETS_DB = [
         "priority": "High",
         "category": "Identity & Access",
         "createdBy": "priya.sharma@corp.internal",
+        "createdByName": "Priya Sharma",
         "approverId": "marcus.vance@corp.internal",
-        "createdAt": "2026-08-25T11:00:00Z"
+        "createdAt": "2026-08-25T11:00:00Z",
+        "updatedAt": "2026-08-25T11:00:00Z"
+    },
+    {
+        "id": "KAN-103",
+        "platform": "JIRA",
+        "title": "External Dell 4K display flickering when connected to CalDigit TS4 dock",
+        "description": "Dual monitor setup flickers on macOS 15.1 after waking from sleep.",
+        "status": "In Progress",
+        "priority": "Medium",
+        "category": "Hardware & Peripherals",
+        "createdBy": "alex.chen@corp.internal",
+        "createdByName": "Alex Chen",
+        "assignedTo": "elena.rostova@corp.internal",
+        "createdAt": "2026-08-26T10:00:00Z",
+        "updatedAt": "2026-08-26T10:00:00Z"
     }
 ]
+
+AUDIT_LOGS_DB: List[Dict[str, Any]] = []
 
 # Request / Response Schemas
 class ChatTurnRequest(BaseModel):
@@ -129,12 +189,24 @@ class CreateTicketRequest(BaseModel):
     priority: Optional[str] = "Medium"
     category: Optional[str] = "General IT"
     created_by: str
+    created_by_name: Optional[str] = None
+
+class VerifyOTPRequest(BaseModel):
+    hitl_id: str
+    otp_code: str
+    user_id: Optional[str] = None
 
 class ResolveApprovalRequest(BaseModel):
     hitl_id: str
     approved: bool
     approver_email: str
     approver_name: str
+
+class EscalateTicketRequest(BaseModel):
+    reason: Optional[str] = "User requested priority escalation"
+
+class CloseTicketRequest(BaseModel):
+    resolution_notes: Optional[str] = "Resolved via HelpDeskGenie service desk"
 
 @app.get("/api/health")
 def health_check():
@@ -216,11 +288,87 @@ def invite_user(req: AdminInviteRequest):
         "role": req.role,
         "department": req.department,
         "manager": "cio@corp.internal",
+        "mobile": "+1 (555) 000-1122",
         "is_locked": False,
-        "auth_source": "ADMIN_INVITE"
+        "auth_source": "ADMIN_INVITE",
+        "status": "invited"
     }
 
     return {"success": True, "invite": invite}
+
+# ----------------- HITL Endpoints (Section 5.2) -----------------
+
+@app.post("/api/hitl/otp/verify")
+def verify_otp(req: VerifyOTPRequest):
+    hitl_req = PENDING_HITL_DB.get(req.hitl_id)
+    code = req.otp_code.strip()
+    
+    # Accept 749216, 123456 or standard 6-digit verification in sandbox
+    if code in ["749216", "123456"] or len(code) == 6:
+        if hitl_req:
+            hitl_req["status"] = "completed"
+            hitl_req["completedAt"] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        # Unlock user if target was locked
+        target_user = req.user_id or (hitl_req.get("userId") if hitl_req else "alex.chen@corp.internal")
+        if target_user and target_user in USERS_DB:
+            USERS_DB[target_user]["is_locked"] = False
+
+        msg = f"Active Directory account has been successfully unlocked and bad password count cleared in AD sandbox." if (hitl_req and hitl_req.get("type") == "unlock_account") else f"Temporary password reset link dispatched to registered user via secure SMS/email channel."
+
+        return {
+            "success": True,
+            "message": msg,
+            "request": hitl_req
+        }
+    
+    return {
+        "success": False,
+        "message": "Incorrect verification code. Please enter the 6-digit OTP code sent to your registered device (Hint: 749216)."
+    }
+
+@app.post("/api/hitl/approval/resolve")
+def resolve_approval(req: ResolveApprovalRequest):
+    hitl_req = PENDING_HITL_DB.get(req.hitl_id)
+    if not hitl_req:
+        hitl_req = {
+            "id": req.hitl_id,
+            "type": "grant_access_request",
+            "userId": "alex.chen@corp.internal",
+            "userName": "Alex Chen",
+            "resourceName": "Production AWS Snowflake Analytics DB",
+            "approverId": req.approver_email,
+            "approverName": req.approver_name,
+            "status": "pending_approval"
+        }
+        PENDING_HITL_DB[req.hitl_id] = hitl_req
+
+    hitl_req["status"] = "approved" if req.approved else "rejected"
+    hitl_req["completedAt"] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+    hitl_req["approvedBy"] = f"{req.approver_name} ({req.approver_email})"
+
+    # Update ticket status if attached
+    if hitl_req.get("ticketId"):
+        for t in TICKETS_DB:
+            if t["id"] == hitl_req["ticketId"]:
+                t["status"] = "Resolved" if req.approved else "Closed"
+
+    resource_name = hitl_req.get("resourceName", "Production Access")
+    msg = f"Access to {resource_name} granted by {req.approver_name}. Provisioned to Active Directory Security Group." if req.approved else f"Access request for {resource_name} was denied by {req.approver_name}."
+
+    return {
+        "success": True,
+        "message": msg,
+        "request": hitl_req
+    }
+
+@app.get("/api/hitl/pending")
+def get_pending_hitl(approver_email: Optional[str] = None):
+    requests = list(PENDING_HITL_DB.values())
+    if approver_email:
+        norm = approver_email.lower().strip()
+        requests = [r for r in requests if r.get("approverId", "").lower() == norm or norm in ["admin@corp.internal", "marcus.vance@corp.internal"]]
+    return requests
 
 # ----------------- Ticketing Endpoints -----------------
 
@@ -243,11 +391,32 @@ def create_ticket(req: CreateTicketRequest):
         "priority": req.priority,
         "category": req.category,
         "createdBy": req.created_by,
+        "createdByName": req.created_by_name or req.created_by.split("@")[0],
         "assignedTo": "elena.rostova@corp.internal" if platform == "JIRA" else "HelpDeskGenie-Automated",
-        "createdAt": time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        "createdAt": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ")
     }
     TICKETS_DB.insert(0, new_ticket)
     return new_ticket
+
+@app.post("/api/tickets/{ticket_id}/escalate")
+def escalate_ticket(ticket_id: str, req: EscalateTicketRequest):
+    for t in TICKETS_DB:
+        if t["id"].lower() == ticket_id.lower().strip():
+            t["priority"] = "Urgent"
+            t["updatedAt"] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+            return {"success": True, "ticket": t}
+    raise HTTPException(status_code=404, detail="Ticket not found")
+
+@app.post("/api/tickets/{ticket_id}/close")
+def close_ticket(ticket_id: str, req: CloseTicketRequest):
+    for t in TICKETS_DB:
+        if t["id"].lower() == ticket_id.lower().strip():
+            t["status"] = "Resolved"
+            t["resolutionNotes"] = req.resolution_notes
+            t["updatedAt"] = time.strftime("%Y-%m-%dT%H:%M:%SZ")
+            return {"success": True, "ticket": t}
+    raise HTTPException(status_code=404, detail="Ticket not found")
 
 # ----------------- LangGraph Execution Endpoint -----------------
 
@@ -291,6 +460,8 @@ def execute_turn(req: ChatTurnRequest):
     if state["detected_intent"] == "actionable_needs_approval":
         hitl_res = hitl_node(state)
         state.update(hitl_res)
+        if state.get("active_hitl"):
+            PENDING_HITL_DB[state["active_hitl"]["id"]] = state["active_hitl"]
     elif state["detected_intent"] == "actionable_safe":
         tool_res = tool_execution_node(state)
         state.update(tool_res)
@@ -308,3 +479,4 @@ def execute_turn(req: ChatTurnRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
+

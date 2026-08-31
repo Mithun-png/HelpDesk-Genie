@@ -22,6 +22,7 @@ import { ticketService } from '../services/ticketService';
 import { identityService } from '../services/identityService';
 import { evaluationService } from '../services/evaluationService';
 import { executeApiTurn } from '../services/api';
+import confetti from 'canvas-confetti';
 
 export type NavigationTab = 
   | 'chat' 
@@ -346,6 +347,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const submitOTP = (hitlId: string, otp: string) => {
     const res = identityService.verifyOTP(hitlId, otp);
     
+    if (res.success) {
+      // If user was locked (e.g. David Kim or Alex Chen), unlock in real-time
+      if (currentUser.isLocked) {
+        setCurrentUser(prev => ({ ...prev, isLocked: false }));
+      }
+      try {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.7 }
+        });
+      } catch (_) {}
+    }
+
     addAuditLog({
       id: `AUDIT-${Math.floor(1000 + Math.random() * 9000)}`,
       timestamp: new Date().toISOString(),
@@ -377,6 +392,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const resolveHITLApproval = (hitlId: string, approved: boolean) => {
     const res = identityService.resolveAccessApproval(hitlId, approved, currentUser.email, currentUser.name);
+
+    if (approved) {
+      try {
+        confetti({
+          particleCount: 70,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+      } catch (_) {}
+    }
 
     addAuditLog({
       id: `AUDIT-${Math.floor(1000 + Math.random() * 9000)}`,
