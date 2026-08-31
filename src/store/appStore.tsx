@@ -21,6 +21,7 @@ import { ragService } from '../services/ragService';
 import { ticketService } from '../services/ticketService';
 import { identityService } from '../services/identityService';
 import { evaluationService } from '../services/evaluationService';
+import { executeApiTurn } from '../services/api';
 
 export type NavigationTab = 
   | 'chat' 
@@ -321,19 +322,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     try {
-      const resultState = await langgraphEngine.executeTurn(activeState, {
-        onNodeEnter: (node) => {
-          setCurrentNode(node);
-        },
-        onAuditLog: (log) => {
-          setAuditLogs(prev => [log, ...prev]);
-        }
-      });
+      setCurrentNode('intent_classifier');
+      const resultState = await executeApiTurn(activeState);
 
       setMessages([...resultState.messages]);
       setGraphState(resultState);
       setCurrentNode(resultState.currentNode);
-      setTickets([...ticketService.getAllTickets()]);
     } catch (err) {
       console.error('Error executing LangGraph turn:', err);
       const errorMsg: ChatMessage = {
