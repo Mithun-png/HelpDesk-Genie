@@ -208,6 +208,12 @@ class EscalateTicketRequest(BaseModel):
 class CloseTicketRequest(BaseModel):
     resolution_notes: Optional[str] = "Resolved via HelpDeskGenie service desk"
 
+from backend.app.jira_client import jira_client
+
+class JiraConfigRequest(BaseModel):
+    instance_url: str
+    project_key: Optional[str] = "ITSD"
+
 @app.get("/api/health")
 def health_check():
     return {
@@ -223,6 +229,20 @@ def health_check():
             "twilio_verify": "connected"
         }
     }
+
+@app.get("/api/jira/status")
+def get_jira_status():
+    return jira_client.test_connection()
+
+@app.post("/api/jira/config")
+def update_jira_config(req: JiraConfigRequest):
+    import os
+    clean_url = req.instance_url.strip().rstrip("/")
+    os.environ["JIRA_INSTANCE_URL"] = clean_url
+    if req.project_key:
+        os.environ["JIRA_PROJECT_KEY"] = req.project_key.strip()
+    jira_client.reload_config()
+    return jira_client.test_connection()
 
 # ----------------- Auth & Identity Endpoints (Section 8) -----------------
 
@@ -381,7 +401,24 @@ def get_tickets(user_email: Optional[str] = None, role: Optional[str] = "it_admi
 @app.post("/api/tickets/create")
 def create_ticket(req: CreateTicketRequest):
     platform = req.platform or "JIRA"
-    ticket_id = f"KAN-{len(TICKETS_DB) + 104}" if platform == "JIRA" else f"INC00{int(time.time() % 100000)}"
+    external_url = None
+    if platform == "JIRA" and jira_client.is_configured():
+        jira_res = jira_client.create_issue(
+            summary=req.title,
+            description=req.description,
+            priority=req.priority
+        )
+        if jira_res.get("success") and jira_res.get("key"):
+            ticket_id = jira_res["key"]
+            external_url = jira_res["url"]
+        else:
+            ticket_id = f"KAN-{len(TICKETS_DB) + 104}"
+    else:
+        ticket_id = f"KAN-{len(TICKETS_DB) + 104}" if platform == "JIRA" else f"INC00{int(time.time() % 100000)}"
+
+    if not external_url:
+        external_url = f"{jira_client.instance_url}/browse/{ticket_id}" if platform == "JIRA" else f"https://dev354821.service-now.com/nav_to.do?uri=incident.do?sys_id={ticket_id}"
+
     new_ticket = {
         "id": ticket_id,
         "platform": platform,
@@ -394,7 +431,8 @@ def create_ticket(req: CreateTicketRequest):
         "createdByName": req.created_by_name or req.created_by.split("@")[0],
         "assignedTo": "elena.rostova@corp.internal" if platform == "JIRA" else "HelpDeskGenie-Automated",
         "createdAt": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ")
+        "updatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "externalUrl": external_url
     }
     TICKETS_DB.insert(0, new_ticket)
     return new_ticket

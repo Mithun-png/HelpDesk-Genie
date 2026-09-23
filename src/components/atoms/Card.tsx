@@ -22,17 +22,17 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const variantStyles = {
-    glass: 'bg-[#12101E]/70 backdrop-blur-xl border border-violet-500/15 shadow-glass-violet',
-    solid: 'bg-[#151224] border border-slate-800 shadow-md',
-    glow: 'bg-gradient-to-b from-[#1A1433]/80 to-[#100D20]/90 backdrop-blur-2xl border border-violet-500/30 shadow-[0_0_30px_rgba(139,92,246,0.15)]',
-    interactive: 'bg-[#12101E]/70 backdrop-blur-xl border border-violet-500/15 hover:border-violet-500/35 hover:bg-[#18142A]/85 transition-all duration-200 cursor-pointer shadow-glass-violet hover:shadow-[0_10px_35px_rgba(139,92,246,0.2)]'
+    glass: 'bg-white/85 backdrop-blur-xl border border-[#2D3B42]/10 shadow-[0_8px_30px_rgba(45,59,66,0.06)]',
+    solid: 'bg-white border border-[#2D3B42]/10 shadow-sm',
+    glow: 'bg-gradient-to-b from-white to-[#FDF1EE] backdrop-blur-2xl border border-[#EF4623]/25 shadow-[0_10px_35px_rgba(239,70,35,0.08)]',
+    interactive: 'bg-white/85 backdrop-blur-xl border border-[#2D3B42]/10 hover:border-[#EF4623]/40 hover:bg-white transition-all duration-200 cursor-pointer shadow-sm hover:shadow-[0_12px_35px_rgba(239,70,35,0.12)]'
   };
 
   return (
     <div
       className={twMerge(
         clsx(
-          "rounded-2xl relative overflow-hidden",
+          "rounded-3xl relative overflow-hidden",
           paddingStyles[padding],
           variantStyles[variant],
           className

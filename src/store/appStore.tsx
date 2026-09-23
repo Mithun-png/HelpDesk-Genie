@@ -59,6 +59,9 @@ interface AppContextType {
 
   // Domain data
   tickets: Ticket[];
+  selectedTicketId: string | null;
+  setSelectedTicketId: (id: string | null) => void;
+  navigateToTicket: (ticketId: string) => void;
   addTicket: (ticket: Ticket) => void;
   escalateTicket: (id: string, reason?: string) => void;
   closeTicket: (id: string, notes: string) => void;
@@ -74,6 +77,10 @@ interface AppContextType {
   setRetrievalThreshold: (val: number) => void;
   sandboxMode: boolean;
   setSandboxMode: (val: boolean) => void;
+  jiraBaseUrl: string;
+  setJiraBaseUrl: (url: string) => void;
+  serviceNowBaseUrl: string;
+  setServiceNowBaseUrl: (url: string) => void;
 
   // Evaluation (Iteration 3)
   evalResults: GoldenTestScenario[];
@@ -86,6 +93,9 @@ const AppContext = createContext<AppContextType | null>(null);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeTab, setActiveTab] = useState<NavigationTab>('chat');
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [jiraBaseUrl, setJiraBaseUrlState] = useState<string>(ticketService.getJiraBaseUrl());
+  const [serviceNowBaseUrl, setServiceNowBaseUrlState] = useState<string>(ticketService.getServiceNowBaseUrl());
   
   // Default user: Alex Chen (Employee)
   const defaultUser = identityService.getUser('alex.chen@corp.internal')!;
@@ -94,11 +104,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify({ sub: defaultUser.id, email: defaultUser.email, role: defaultUser.role }))}`
   );
 
-  const [tickets, setTickets] = useState<Ticket[]>(INITIAL_TICKETS);
+  const [tickets, setTickets] = useState<Ticket[]>(ticketService.getAllTickets());
   const [kbArticles, setKBArticles] = useState<KBArticle[]>(INITIAL_KB_ARTICLES);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
   const [retrievalThreshold, setRetrievalThresholdState] = useState<number>(0.65);
   const [sandboxMode, setSandboxMode] = useState<boolean>(true);
+
+  const setJiraBaseUrl = (url: string) => {
+    setJiraBaseUrlState(url);
+    ticketService.setJiraBaseUrl(url);
+    setTickets([...ticketService.getAllTickets()]);
+  };
+
+  const setServiceNowBaseUrl = (url: string) => {
+    setServiceNowBaseUrlState(url);
+    ticketService.setServiceNowBaseUrl(url);
+    setTickets([...ticketService.getAllTickets()]);
+  };
+
+  const navigateToTicket = (ticketId: string) => {
+    setSelectedTicketId(ticketId);
+    setActiveTab('tickets');
+  };
 
   // Invites state
   const [invites, setInvites] = useState<AdminInvite[]>(identityService.getAllInvites());
@@ -481,6 +508,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       submitOTP,
       resolveHITLApproval,
       tickets,
+      selectedTicketId,
+      setSelectedTicketId,
+      navigateToTicket,
       addTicket,
       escalateTicket,
       closeTicket,
@@ -492,6 +522,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setRetrievalThreshold,
       sandboxMode,
       setSandboxMode,
+      jiraBaseUrl,
+      setJiraBaseUrl,
+      serviceNowBaseUrl,
+      setServiceNowBaseUrl,
       evalResults,
       evalMetrics,
       isEvaluating,

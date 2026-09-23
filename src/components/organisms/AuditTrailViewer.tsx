@@ -38,11 +38,11 @@ export const AuditTrailViewer: React.FC = () => {
       {/* Header & Export */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-violet-400" />
+          <h2 className="text-2xl font-bold font-serif text-[#2D3B42] flex items-center gap-2 tracking-tight">
+            <Shield className="w-5 h-5 text-[#EF4623]" />
             Security & Compliance Audit Trail
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-[#2D3B42]/60 mt-0.5">
             Immutable log of all intent classifications, tool executions, HITL MFA approvals, and escalations
           </p>
         </div>
@@ -50,21 +50,21 @@ export const AuditTrailViewer: React.FC = () => {
         <Button
           variant="glass"
           onClick={exportAuditLogsJSON}
-          leftIcon={<Download className="w-4 h-4" />}
-          className="border-violet-500/30"
+          leftIcon={<Download className="w-4 h-4 text-[#EF4623]" />}
+          className="border-[#2D3B42]/15 rounded-[30px]"
         >
           Export Compliance JSON
         </Button>
       </div>
 
       {/* Filter Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-2xl bg-[#120F20]/80 border border-violet-500/15 backdrop-blur-xl">
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-3xl bg-white/85 border border-[#2D3B42]/10 backdrop-blur-xl shadow-sm">
         <div className="sm:col-span-6">
           <Input
             placeholder="Search by Log ID, User, or Tool Name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            leftIcon={<Search className="w-4 h-4 text-violet-400" />}
+            leftIcon={<Search className="w-4 h-4 text-[#EF4623]" />}
           />
         </div>
 
@@ -72,7 +72,7 @@ export const AuditTrailViewer: React.FC = () => {
           <select
             value={eventTypeFilter}
             onChange={(e) => setEventTypeFilter(e.target.value)}
-            className="w-full rounded-xl bg-[#0F0D1C]/80 border border-violet-500/20 px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-violet-500"
+            className="w-full rounded-2xl bg-white border border-[#2D3B42]/15 px-3.5 py-2.5 text-xs text-[#2D3B42] focus:outline-none focus:border-[#EF4623] shadow-sm"
           >
             <option value="All">All Event Types</option>
             <option value="INTENT_CLASSIFICATION">INTENT_CLASSIFICATION</option>
@@ -88,7 +88,7 @@ export const AuditTrailViewer: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="w-full rounded-xl bg-[#0F0D1C]/80 border border-violet-500/20 px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-violet-500"
+            className="w-full rounded-2xl bg-white border border-[#2D3B42]/15 px-3.5 py-2.5 text-xs text-[#2D3B42] focus:outline-none focus:border-[#EF4623] shadow-sm"
           >
             <option value="All">All Statuses</option>
             <option value="SUCCESS">SUCCESS</option>
@@ -106,8 +106,8 @@ export const AuditTrailViewer: React.FC = () => {
         ))}
 
         {filteredLogs.length === 0 && (
-          <div className="text-center py-12 border border-dashed border-violet-500/20 rounded-2xl bg-white/[0.02]">
-            <p className="text-sm text-slate-400">No audit records found matching query.</p>
+          <div className="text-center py-12 border border-dashed border-[#2D3B42]/20 rounded-3xl bg-white/40">
+            <p className="text-sm text-[#2D3B42]/60">No audit records found matching query.</p>
           </div>
         )}
       </div>

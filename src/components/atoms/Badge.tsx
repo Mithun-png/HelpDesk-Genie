@@ -42,81 +42,81 @@ export const Badge: React.FC<BadgeProps> = ({
     md: 'px-2.5 py-1 text-xs font-semibold tracking-wide'
   };
 
-  let colorStyles = "bg-violet-500/10 text-violet-300 border border-violet-500/30";
+  let colorStyles = "bg-[#EF4623]/10 text-[#EF4623] border border-[#EF4623]/25";
   let content = children;
 
   if (variant === 'purple') {
-    colorStyles = "bg-violet-500/20 text-violet-200 border border-violet-500/40 shadow-sm shadow-violet-500/20";
+    colorStyles = "bg-[#EF4623]/15 text-[#EF4623] border border-[#EF4623]/35 shadow-sm shadow-[#EF4623]/15";
   } else if (variant === 'success') {
-    colorStyles = "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+    colorStyles = "bg-emerald-500/15 text-emerald-700 border border-emerald-500/30";
   } else if (variant === 'warning') {
-    colorStyles = "bg-amber-500/15 text-amber-300 border border-amber-500/30";
+    colorStyles = "bg-amber-500/15 text-amber-700 border border-amber-500/30";
   } else if (variant === 'danger') {
-    colorStyles = "bg-rose-500/15 text-rose-300 border border-rose-500/30";
+    colorStyles = "bg-rose-500/15 text-rose-700 border border-rose-500/30";
   } else if (variant === 'info') {
-    colorStyles = "bg-sky-500/15 text-sky-300 border border-sky-500/30";
+    colorStyles = "bg-sky-500/15 text-sky-700 border border-sky-500/30";
   } else if (variant === 'default') {
-    colorStyles = "bg-slate-500/15 text-slate-300 border border-slate-500/30";
+    colorStyles = "bg-[#2D3B42]/10 text-[#2D3B42] border border-[#2D3B42]/20";
   } else if (variant === 'intent' && intent) {
     switch (intent) {
       case 'informational':
-        colorStyles = "bg-sky-500/15 text-sky-300 border border-sky-500/30";
+        colorStyles = "bg-sky-500/15 text-sky-700 border border-sky-500/30";
         content = content || 'Informational (RAG)';
         break;
       case 'actionable_safe':
-        colorStyles = "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+        colorStyles = "bg-emerald-500/15 text-emerald-700 border border-emerald-500/30";
         content = content || 'Safe Self-Service';
         break;
       case 'actionable_needs_approval':
-        colorStyles = "bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]";
+        colorStyles = "bg-amber-500/15 text-amber-700 border border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.2)]";
         content = content || 'Sensitive (HITL Required)';
         break;
       case 'ambiguous':
-        colorStyles = "bg-purple-500/15 text-purple-300 border border-purple-500/30";
+        colorStyles = "bg-[#EF4623]/10 text-[#EF4623] border border-[#EF4623]/30";
         content = content || 'Clarify / Escalate';
         break;
     }
   } else if (variant === 'status' && status) {
     switch (status) {
       case 'Open':
-        colorStyles = "bg-blue-500/15 text-blue-300 border border-blue-500/30";
+        colorStyles = "bg-sky-500/15 text-sky-700 border border-sky-500/30";
         break;
       case 'In Progress':
-        colorStyles = "bg-indigo-500/15 text-indigo-300 border border-indigo-500/30";
+        colorStyles = "bg-[#EF4623]/15 text-[#EF4623] border border-[#EF4623]/35";
         break;
       case 'Pending Approval':
-        colorStyles = "bg-amber-500/15 text-amber-300 border border-amber-500/30";
+        colorStyles = "bg-amber-500/15 text-amber-700 border border-amber-500/30";
         break;
       case 'Resolved':
       case 'Closed':
-        colorStyles = "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+        colorStyles = "bg-emerald-500/15 text-emerald-700 border border-emerald-500/30";
         break;
     }
     content = content || status;
   } else if (variant === 'priority' && priority) {
     switch (priority) {
       case 'Low':
-        colorStyles = "bg-slate-500/15 text-slate-300 border border-slate-500/30";
+        colorStyles = "bg-slate-500/10 text-slate-700 border border-slate-500/20";
         break;
       case 'Medium':
-        colorStyles = "bg-blue-500/15 text-blue-300 border border-blue-500/30";
+        colorStyles = "bg-sky-500/15 text-sky-700 border border-sky-500/30";
         break;
       case 'High':
-        colorStyles = "bg-amber-500/15 text-amber-300 border border-amber-500/30";
+        colorStyles = "bg-amber-500/15 text-amber-700 border border-amber-500/30";
         break;
       case 'Urgent':
-        colorStyles = "bg-rose-500/20 text-rose-300 border border-rose-500/40 shadow-[0_0_8px_rgba(244,63,94,0.3)] animate-pulse";
+        colorStyles = "bg-rose-500/20 text-rose-700 border border-rose-500/40 shadow-[0_0_8px_rgba(244,63,94,0.2)] animate-pulse";
         break;
     }
     content = content || priority;
   } else if (variant === 'confidence' && score !== undefined) {
     const pct = Math.round(score * 100);
     if (pct >= 80) {
-      colorStyles = "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30";
+      colorStyles = "bg-emerald-500/15 text-emerald-700 border border-emerald-500/30";
     } else if (pct >= 65) {
-      colorStyles = "bg-amber-500/15 text-amber-300 border border-amber-500/30";
+      colorStyles = "bg-amber-500/15 text-amber-700 border border-amber-500/30";
     } else {
-      colorStyles = "bg-rose-500/15 text-rose-300 border border-rose-500/30";
+      colorStyles = "bg-rose-500/15 text-rose-700 border border-rose-500/30";
     }
     content = content || `${pct}% Confidence`;
   }

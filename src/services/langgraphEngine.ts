@@ -216,6 +216,8 @@ export class LangGraphEngine {
           graphState: 'tool_execution',
           ticketRef: ticket,
           suggestedActions: [
+            { label: ticket.platform === 'JIRA' ? 'Open in JIRA Cloud' : 'Open in ServiceNow', action: ticket.platform === 'JIRA' ? 'redirect_jira' : 'redirect_servicenow', payload: ticket },
+            { label: 'View in Service Desk Hub', action: 'view_ticket_hub', payload: ticket.id },
             { label: 'Escalate to Urgent', action: 'escalate_ticket', payload: ticket.id },
             { label: 'Close Ticket', action: 'close_ticket', payload: ticket.id }
           ]
@@ -227,7 +229,10 @@ export class LangGraphEngine {
           content: `I could not locate ticket **${ticketId}** in JIRA or ServiceNow. Would you like me to open a new ticket for you?`,
           timestamp: new Date().toISOString(),
           intent: 'actionable_safe',
-          graphState: 'tool_execution'
+          graphState: 'tool_execution',
+          suggestedActions: [
+            { label: `Create New Ticket for ${ticketId}`, action: 'quick_ticket', payload: `Assistance regarding ${ticketId}` }
+          ]
         };
       }
     } 
@@ -244,7 +249,11 @@ export class LangGraphEngine {
         timestamp: new Date().toISOString(),
         intent: 'actionable_safe',
         graphState: 'tool_execution',
-        ticketRef: res.ticket
+        ticketRef: res.ticket,
+        suggestedActions: [
+          { label: res.ticket?.platform === 'JIRA' ? 'Open in JIRA Cloud' : 'Open in ServiceNow', action: res.ticket?.platform === 'JIRA' ? 'redirect_jira' : 'redirect_servicenow', payload: res.ticket },
+          { label: 'View in Service Desk Hub', action: 'view_ticket_hub', payload: ticketId }
+        ]
       };
     }
     else if (toolName === 'close_ticket') {
@@ -260,7 +269,10 @@ export class LangGraphEngine {
         timestamp: new Date().toISOString(),
         intent: 'actionable_safe',
         graphState: 'tool_execution',
-        ticketRef: res.ticket
+        ticketRef: res.ticket,
+        suggestedActions: [
+          { label: 'View in Service Desk Hub', action: 'view_ticket_hub', payload: ticketId }
+        ]
       };
     }
     else {
@@ -284,7 +296,12 @@ export class LangGraphEngine {
         timestamp: new Date().toISOString(),
         intent: 'actionable_safe',
         graphState: 'tool_execution',
-        ticketRef: newTicket
+        ticketRef: newTicket,
+        suggestedActions: [
+          { label: newTicket.platform === 'JIRA' ? 'Open in JIRA Cloud' : 'Open in ServiceNow', action: newTicket.platform === 'JIRA' ? 'redirect_jira' : 'redirect_servicenow', payload: newTicket },
+          { label: 'View in Service Desk Hub', action: 'view_ticket_hub', payload: newTicket.id },
+          { label: 'Escalate to Urgent', action: 'escalate_ticket', payload: newTicket.id }
+        ]
       };
     }
 
@@ -462,7 +479,11 @@ export class LangGraphEngine {
           missingDetails: 'Environment configuration, exact error codes, or local host settings',
           assignedQueue: 'Tier-1-LiveSupport'
         },
-        ticketRef: escalationTicket
+        ticketRef: escalationTicket,
+        suggestedActions: [
+          { label: 'Open in ServiceNow', action: 'redirect_servicenow', payload: escalationTicket },
+          { label: 'View in Service Desk Hub', action: 'view_ticket_hub', payload: escalationTicket.id }
+        ]
       };
 
       state.messages.push(assistantMsg);

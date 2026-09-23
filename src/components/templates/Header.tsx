@@ -59,22 +59,22 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-16 px-4 sm:px-6 border-b border-violet-500/15 bg-[#09080E]/80 backdrop-blur-xl flex items-center justify-between sticky top-0 z-30">
+    <header className="h-16 px-4 sm:px-6 border-b border-[#2D3B42]/10 bg-white/80 backdrop-blur-[12px] flex items-center justify-between sticky top-0 z-30 shadow-[0_4px_20px_-2px_rgba(45,59,66,0.05)]">
       {/* Brand & Title */}
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-600/30 border border-violet-400/30">
+        <div className="p-2 rounded-2xl bg-[#EF4623] text-white shadow-lg shadow-[#EF4623]/25 border border-[#EF4623]/30">
           <Bot className="w-5 h-5" />
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-base font-extrabold text-slate-100 tracking-tight">
-              HelpDesk<span className="text-violet-400">Genie</span>
+            <h1 className="text-base font-extrabold text-[#2D3B42] tracking-tight">
+              HelpDesk<span className="text-[#EF4623] font-serif italic text-lg">Genie</span>
             </h1>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 border border-violet-500/30 font-bold uppercase tracking-wide">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#EF4623]/10 text-[#EF4623] border border-[#EF4623]/25 font-bold uppercase tracking-wide">
               Enterprise AI Layer
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 hidden sm:block">
+          <p className="text-[11px] text-[#2D3B42]/60 hidden sm:block">
             LangGraph State Machine • RAG Hallucination-Controlled • Zero-Trust HITL
           </p>
         </div>
@@ -84,8 +84,8 @@ export const Header: React.FC = () => {
       <div className="flex items-center gap-3">
         {/* Approvals notification pill if approver/admin */}
         {(currentUser.role === 'approver' || currentUser.role === 'it_admin') && pendingApprovalsCount > 0 && (
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold animate-pulse">
-            <ShieldCheck className="w-3.5 h-3.5" />
+          <div className="hidden lg:flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 text-xs font-semibold animate-pulse">
+            <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
             <span>{pendingApprovalsCount} Pending HITL Sign-off</span>
           </div>
         )}
@@ -94,30 +94,30 @@ export const Header: React.FC = () => {
         <div className="relative">
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="flex items-center gap-2.5 p-1.5 sm:px-3 sm:py-1.5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-violet-500/20 transition-all text-left group"
+            className="flex items-center gap-2.5 p-1.5 sm:px-3 sm:py-1.5 rounded-[30px] bg-white/80 hover:bg-white border border-[#2D3B42]/15 shadow-sm transition-all text-left group"
           >
             <div className="text-right hidden sm:block">
               <div className="flex items-center gap-1.5 justify-end">
-                <span className="text-xs font-bold text-slate-200 block leading-tight">{currentUser.name}</span>
+                <span className="text-xs font-bold text-[#2D3B42] block leading-tight">{currentUser.name}</span>
                 <Badge variant={getRoleBadgeVariant(currentUser.role)} className="text-[9px] py-0 px-1.5">
                   {currentUser.role}
                 </Badge>
               </div>
-              <span className="text-[10px] text-violet-400 font-mono">{currentUser.email}</span>
+              <span className="text-[10px] text-[#EF4623] font-mono">{currentUser.email}</span>
             </div>
             
             <Avatar type={currentUser.role === 'it_admin' ? 'assistant' : 'user'} size="sm" />
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-200 transition-transform" />
+            <ChevronDown className="w-3.5 h-3.5 text-[#2D3B42]/50 group-hover:text-[#2D3B42] transition-transform" />
           </button>
 
           {/* Dropdown Menu */}
           {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-[#120F24] border border-violet-500/25 shadow-2xl shadow-black/80 backdrop-blur-2xl p-2 z-50 text-xs space-y-2">
-              <div className="px-2.5 py-1.5 border-b border-white/5">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">
+            <div className="absolute right-0 mt-2 w-72 rounded-3xl bg-white/95 border border-[#2D3B42]/10 shadow-2xl backdrop-blur-2xl p-2 z-50 text-xs space-y-2">
+              <div className="px-2.5 py-1.5 border-b border-[#2D3B42]/10">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-[#2D3B42]/60 block">
                   Switch Testing Persona (RBAC)
                 </span>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-[11px] text-[#2D3B42]/70 mt-0.5">
                   Switch between Employees, IT Triage Agents, Approvers, and Admin
                 </p>
               </div>
@@ -129,36 +129,36 @@ export const Header: React.FC = () => {
                     <button
                       key={user.id}
                       onClick={() => handleSwitchUser(user.email)}
-                      className={`w-full flex items-center justify-between p-2 rounded-xl transition-all text-left ${
+                      className={`w-full flex items-center justify-between p-2 rounded-2xl transition-all text-left ${
                         isSelected 
-                          ? 'bg-violet-600/25 text-violet-200 border border-violet-500/40' 
-                          : 'hover:bg-white/5 text-slate-300 border border-transparent'
+                          ? 'bg-[#EF4623]/15 text-[#EF4623] border border-[#EF4623]/30 font-semibold' 
+                          : 'hover:bg-[#2D3B42]/5 text-[#2D3B42] border border-transparent'
                       }`}
                     >
                       <div className="truncate pr-2">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-semibold text-slate-200">{user.name}</span>
-                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-black/40 text-violet-300 font-mono">
+                          <span className="font-semibold text-[#2D3B42]">{user.name}</span>
+                          <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#2D3B42]/10 text-[#2D3B42] font-mono">
                             {user.role}
                           </span>
                         </div>
-                        <span className="text-[10px] text-slate-400 block truncate">{user.email}</span>
+                        <span className="text-[10px] text-[#2D3B42]/60 block truncate">{user.email}</span>
                       </div>
-                      {isSelected && <Check className="w-4 h-4 text-violet-400 flex-shrink-0" />}
+                      {isSelected && <Check className="w-4 h-4 text-[#EF4623] flex-shrink-0" />}
                     </button>
                   );
                 })}
               </div>
 
-              <div className="border-t border-white/5 pt-1.5 flex flex-col gap-1">
+              <div className="border-t border-[#2D3B42]/10 pt-1.5 flex flex-col gap-1">
                 <button
                   onClick={() => {
                     setIsDropdownOpen(false);
                     setIsLoginModalOpen(true);
                   }}
-                  className="w-full flex items-center gap-2 p-2 rounded-xl text-slate-300 hover:bg-white/5 hover:text-slate-100 transition-colors text-left"
+                  className="w-full flex items-center gap-2 p-2 rounded-2xl text-[#2D3B42] hover:bg-[#EF4623]/10 hover:text-[#EF4623] transition-colors text-left font-medium"
                 >
-                  <KeyRound className="w-3.5 h-3.5 text-violet-400" />
+                  <KeyRound className="w-3.5 h-3.5 text-[#EF4623]" />
                   <span>AD/LDAP Sandbox Login & JWT Token</span>
                 </button>
               </div>
@@ -174,13 +174,13 @@ export const Header: React.FC = () => {
         title="Active Directory / LDAP Authentication (Section 8)"
       >
         <div className="space-y-4 text-xs">
-          <p className="text-slate-400">
-            Employees authenticate against the enterprise Active Directory domain (<code className="text-violet-300">corp.internal</code>). Upon successful binding, a signed JWT session token is attached automatically to every chat turn and ticket.
+          <p className="text-[#2D3B42]/80">
+            Employees authenticate against the enterprise Active Directory domain (<code className="text-[#EF4623] font-semibold">corp.internal</code>). Upon successful binding, a signed JWT session token is attached automatically to every chat turn and ticket.
           </p>
 
           <form onSubmit={handleLdapLoginSubmit} className="space-y-3">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">Corporate User ID / Email</label>
+              <label className="block text-[#2D3B42] font-semibold mb-1">Corporate User ID / Email</label>
               <Input
                 type="email"
                 placeholder="e.g. alex.chen@corp.internal"
@@ -191,7 +191,7 @@ export const Header: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">AD Password</label>
+              <label className="block text-[#2D3B42] font-semibold mb-1">AD Password</label>
               <Input
                 type="password"
                 placeholder="••••••••••••"
@@ -201,8 +201,8 @@ export const Header: React.FC = () => {
             </div>
 
             {loginError && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+              <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-700 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5 text-rose-600" />
                 <span>{loginError}</span>
               </div>
             )}
@@ -218,11 +218,11 @@ export const Header: React.FC = () => {
           </form>
 
           {/* Active JWT Session inspector */}
-          <div className="mt-4 pt-3 border-t border-violet-500/15 space-y-1.5">
-            <span className="text-[10px] font-mono font-bold text-violet-400 uppercase tracking-wider block">
+          <div className="mt-4 pt-3 border-t border-[#2D3B42]/10 space-y-1.5">
+            <span className="text-[10px] font-mono font-bold text-[#EF4623] uppercase tracking-wider block">
               Active JWT Session Token
             </span>
-            <div className="p-2.5 rounded-xl bg-black/50 border border-white/5 font-mono text-[10px] text-slate-400 break-all">
+            <div className="p-2.5 rounded-2xl bg-[#2D3B42]/5 border border-[#2D3B42]/10 font-mono text-[10px] text-[#2D3B42]/80 break-all">
               {jwtToken}
             </div>
           </div>

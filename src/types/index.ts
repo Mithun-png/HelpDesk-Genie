@@ -52,6 +52,8 @@ export interface Ticket {
   updatedAt: string;
   resolutionNotes?: string;
   conversationId?: string;
+  externalUrl?: string;
+  serviceDeskUrl?: string;
   metadata?: Record<string, unknown>;
 }
 

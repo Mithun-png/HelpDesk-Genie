@@ -4,6 +4,72 @@ import { Ticket, PlatformType, TicketPriority, TicketStatus, UserRole } from '..
 export class TicketService {
   private tickets: Ticket[] = [...INITIAL_TICKETS];
   private nextJiraNum = 104;
+  private jiraBaseUrl: string;
+  private serviceNowBaseUrl: string;
+
+  constructor() {
+    const envJira = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_JIRA_INSTANCE_URL) || '';
+    const storedJira = typeof localStorage !== 'undefined' ? localStorage.getItem('helpdeskgenie_jira_url') : null;
+    const resolvedJira = storedJira || (envJira && !envJira.includes('your-domain') ? envJira : 'https://smithunpillai-1787661457265.atlassian.net');
+    this.jiraBaseUrl = resolvedJira.replace(/\/$/, '');
+
+    const envSN = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SERVICENOW_INSTANCE) || '';
+    const storedSN = typeof localStorage !== 'undefined' ? localStorage.getItem('helpdeskgenie_sn_url') : null;
+    const resolvedSN = storedSN || (envSN ? `https://${envSN.replace(/^https?:\/\//, '')}` : 'https://dev354821.service-now.com');
+    this.serviceNowBaseUrl = resolvedSN.replace(/\/$/, '');
+
+    // Populate externalUrl for initial tickets
+    this.tickets = this.tickets.map(t => ({
+      ...t,
+      externalUrl: this.getExternalUrl(t.platform, t.id),
+      serviceDeskUrl: `#ticket-${t.id}`
+    }));
+  }
+
+  public setJiraBaseUrl(url: string) {
+    this.jiraBaseUrl = url.replace(/\/$/, '');
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('helpdeskgenie_jira_url', this.jiraBaseUrl);
+    }
+    this.tickets = this.tickets.map(t => ({
+      ...t,
+      externalUrl: this.getExternalUrl(t.platform, t.id)
+    }));
+  }
+
+  public setServiceNowBaseUrl(url: string) {
+    this.serviceNowBaseUrl = url.replace(/\/$/, '');
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('helpdeskgenie_sn_url', this.serviceNowBaseUrl);
+    }
+    this.tickets = this.tickets.map(t => ({
+      ...t,
+      externalUrl: this.getExternalUrl(t.platform, t.id)
+    }));
+  }
+
+  public getJiraBaseUrl(): string {
+    return this.jiraBaseUrl;
+  }
+
+  public getJiraBoardUrl(): string {
+    return `${this.jiraBaseUrl}/browse/KAN`;
+  }
+
+  public getJiraProjectsUrl(): string {
+    return `${this.jiraBaseUrl}/jira/projects`;
+  }
+
+  public getServiceNowBaseUrl(): string {
+    return this.serviceNowBaseUrl;
+  }
+
+  public getExternalUrl(platform: PlatformType, _id: string): string {
+    if (platform === 'JIRA') {
+      return `${this.jiraBaseUrl}/browse/KAN`;
+    }
+    return `${this.serviceNowBaseUrl}/nav_to.do?uri=incident.do?sys_id=${_id}`;
+  }
 
   public getAllTickets(): Ticket[] {
     return this.tickets;
@@ -54,7 +120,9 @@ export class TicketService {
       approverId: params.approverId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      conversationId: params.conversationId
+      conversationId: params.conversationId,
+      externalUrl: this.getExternalUrl(platform, newId),
+      serviceDeskUrl: `#ticket-${newId}`
     };
 
     this.tickets.unshift(newTicket);

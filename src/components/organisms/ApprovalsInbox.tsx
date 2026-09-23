@@ -38,14 +38,14 @@ export const ApprovalsInbox: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <div className="p-2 rounded-2xl bg-amber-500/15 text-amber-700 border border-amber-500/30">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+              <h2 className="text-2xl font-bold font-serif text-[#2D3B42] flex items-center gap-2 tracking-tight">
                 Human-in-the-Loop (HITL) Approvals Inbox
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#2D3B42]/60 mt-0.5">
                 Authorized managerial sign-off portal for elevated permissions and sensitive identity actions
               </p>
             </div>
@@ -60,13 +60,13 @@ export const ApprovalsInbox: React.FC = () => {
       </div>
 
       {/* Approver Policy Notice */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/30 to-violet-950/20 border border-amber-500/20 text-xs text-slate-300 flex items-start gap-3">
-        <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+      <div className="p-4 rounded-3xl bg-amber-50/85 border border-amber-500/30 text-xs text-[#2D3B42] flex items-start gap-3 shadow-sm">
+        <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="font-semibold text-amber-200">
+          <p className="font-bold text-[#2D3B42]">
             Enterprise Zero-Trust Policy Active (Section 5.2 & 7.4)
           </p>
-          <p className="text-slate-400 leading-relaxed">
+          <p className="text-[#2D3B42]/70 leading-relaxed">
             Elevated resource accesses (e.g. AWS Production DB, Snowflake Governance) are never auto-provisioned. Approvers must verify requester identity, business justification, and required access window before signing off. All decisions are immutably signed to the PostgreSQL audit trail.
           </p>
         </div>
@@ -74,12 +74,12 @@ export const ApprovalsInbox: React.FC = () => {
 
       {/* Pending Approval List */}
       {pendingRequests.length === 0 ? (
-        <Card className="p-12 text-center bg-[#0F0C1B]/80 border-violet-500/15">
-          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+        <Card className="p-12 text-center bg-white/85 border border-[#2D3B42]/10 rounded-3xl shadow-sm">
+          <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600">
             <CheckCircle2 className="w-7 h-7" />
           </div>
-          <h3 className="text-base font-bold text-slate-200">Inbox Clean & Compliant</h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto mt-1">
+          <h3 className="text-base font-bold text-[#2D3B42]">Inbox Clean & Compliant</h3>
+          <p className="text-xs text-[#2D3B42]/60 max-w-md mx-auto mt-1">
             There are currently no outstanding HITL approval checkpoints requiring your sign-off.
           </p>
         </Card>
@@ -88,28 +88,28 @@ export const ApprovalsInbox: React.FC = () => {
           {pendingRequests.map(req => (
             <Card 
               key={req.id}
-              className="p-5 bg-gradient-to-br from-[#120E24] to-[#0D0B18] border-violet-500/20 hover:border-violet-500/40 transition-all space-y-4"
+              className="p-5 bg-white/90 border border-[#2D3B42]/10 hover:border-[#EF4623]/35 rounded-3xl shadow-sm transition-all space-y-4"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-violet-500/15 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#2D3B42]/10 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-violet-600/20 text-violet-300 border border-violet-500/30">
+                  <div className="p-2.5 rounded-2xl bg-[#EF4623]/10 text-[#EF4623] border border-[#EF4623]/25">
                     <Lock className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold text-violet-400">{req.id}</span>
-                      <span className="text-slate-500">•</span>
-                      <span className="text-sm font-bold text-slate-100">{req.resourceName || 'Privileged Access'}</span>
+                      <span className="text-xs font-mono font-bold text-[#EF4623]">{req.id}</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-sm font-bold text-[#2D3B42]">{req.resourceName || 'Privileged Access'}</span>
                     </div>
-                    <p className="text-xs text-slate-400">
-                      Requested by <strong className="text-slate-200">{req.userName || req.userId}</strong> ({req.userId})
+                    <p className="text-xs text-[#2D3B42]/70">
+                      Requested by <strong className="text-[#2D3B42]">{req.userName || req.userId}</strong> ({req.userId})
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 self-start sm:self-center">
-                  <span className="text-[11px] text-slate-400 flex items-center gap-1 font-mono">
-                    <Clock className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="text-[11px] text-[#2D3B42]/60 flex items-center gap-1 font-mono">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" />
                     {new Date(req.requestedAt).toLocaleTimeString()}
                   </span>
                   <Badge variant="warning" className="text-[10px]">Pending Sign-Off</Badge>
@@ -117,34 +117,35 @@ export const ApprovalsInbox: React.FC = () => {
               </div>
 
               {/* Justification & Metadata */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3.5 rounded-xl bg-black/30 border border-white/5 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-[#FDF1EE]/70 border border-[#2D3B42]/10 text-xs">
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Business Justification</span>
-                  <p className="text-slate-200 mt-1">{req.justification || 'Incident investigation and telemetry verification.'}</p>
+                  <span className="text-[#2D3B42]/60 block text-[10px] uppercase font-bold tracking-wider">Business Justification</span>
+                  <p className="text-[#2D3B42] mt-1">{req.justification || 'Incident investigation and telemetry verification.'}</p>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Designated Approver</span>
-                  <p className="text-violet-300 mt-1 font-semibold">{req.approverName || req.approverId}</p>
+                  <span className="text-[#2D3B42]/60 block text-[10px] uppercase font-bold tracking-wider">Designated Approver</span>
+                  <p className="text-[#EF4623] mt-1 font-semibold">{req.approverName || req.approverId}</p>
                 </div>
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Verification Protocol</span>
-                  <p className="text-slate-200 mt-1 font-mono">{req.verificationMethod || 'Manager_Signoff'}</p>
+                  <span className="text-[#2D3B42]/60 block text-[10px] uppercase font-bold tracking-wider">Verification Protocol</span>
+                  <p className="text-[#2D3B42] mt-1 font-mono">{req.verificationMethod || 'Manager_Signoff'}</p>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
-                <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="text-[11px] text-[#2D3B42]/60 flex items-center gap-1.5">
+                  <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Approving will commit transaction under: <strong>{currentUser.email}</strong></span>
                 </div>
 
                 <div className="flex items-center gap-2 self-end sm:self-auto">
                   <Button
-                    variant="danger"
+                    variant="secondary"
                     size="sm"
                     onClick={() => handleReject(req.id)}
-                    leftIcon={<XCircle className="w-4 h-4" />}
+                    leftIcon={<XCircle className="w-4 h-4 text-rose-500" />}
+                    className="rounded-[30px]"
                   >
                     Reject Access
                   </Button>
@@ -153,7 +154,7 @@ export const ApprovalsInbox: React.FC = () => {
                     size="sm"
                     onClick={() => handleApprove(req.id)}
                     leftIcon={<CheckCircle2 className="w-4 h-4" />}
-                    className="shadow-md shadow-emerald-500/20"
+                    className="shadow-md shadow-emerald-500/20 rounded-[30px]"
                   >
                     Sign & Approve Access
                   </Button>

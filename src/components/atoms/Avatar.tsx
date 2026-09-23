@@ -31,10 +31,10 @@ export const Avatar: React.FC<AvatarProps> = ({
   };
 
   const bgStyles = {
-    bot: 'bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-500 text-white shadow-lg shadow-violet-500/25 border border-violet-400/30',
-    assistant: 'bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-500 text-white shadow-lg shadow-violet-500/25 border border-violet-400/30',
-    user: 'bg-gradient-to-tr from-slate-700 to-slate-800 text-slate-200 border border-slate-600/40',
-    admin: 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white border border-emerald-400/30 shadow-md shadow-emerald-500/20',
+    bot: 'bg-gradient-to-tr from-[#EF4623] to-[#D93816] text-white shadow-md shadow-[#EF4623]/25 border border-[#EF4623]/30',
+    assistant: 'bg-gradient-to-tr from-[#EF4623] to-[#D93816] text-white shadow-md shadow-[#EF4623]/25 border border-[#EF4623]/30',
+    user: 'bg-gradient-to-tr from-[#2D3B42] to-[#1F292E] text-white border border-[#2D3B42]/30 shadow-sm',
+    admin: 'bg-gradient-to-tr from-[#2D3B42] via-[#374852] to-[#EF4623] text-white border border-[#EF4623]/30 shadow-md shadow-[#EF4623]/20',
     approver: 'bg-gradient-to-tr from-amber-600 to-orange-500 text-white border border-amber-400/30 shadow-md shadow-amber-500/20'
   };
 
@@ -54,11 +54,11 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <div className="relative inline-flex flex-shrink-0">
-      <div className={twMerge(clsx("rounded-xl flex items-center justify-center font-bold select-none", sizeStyles[size], bgStyles[type], className))}>
+      <div className={twMerge(clsx("rounded-2xl flex items-center justify-center font-bold select-none", sizeStyles[size], bgStyles[type], className))}>
         {renderIcon()}
       </div>
       {isOnline && (
-        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#09080E] ring-1 ring-emerald-500/50" />
+        <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white ring-1 ring-emerald-500/40" />
       )}
     </div>
   );

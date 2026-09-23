@@ -42,10 +42,11 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   const visibleNavItems = allNavItems.filter(item => item.roles.includes(currentUser.role));
 
   return (
-    <div className="min-h-screen bg-[#09080E] text-slate-100 flex flex-col relative overflow-hidden">
-      {/* Subtle glowing ambient gradient blobs in background */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none -z-10" />
+    <div className="min-h-screen bg-[#FDF1EE] text-[#2D3B42] flex flex-col relative overflow-hidden font-['Manrope',sans-serif]">
+      {/* Ambient background blurs (#EF4623 at 10% opacity with 100px-120px blur radii to create depth) */}
+      <div className="absolute top-0 left-1/4 w-[450px] h-[450px] bg-[#EF4623]/10 rounded-full blur-[110px] pointer-events-none -z-10" />
+      <div className="absolute bottom-10 right-1/4 w-[500px] h-[500px] bg-[#EF4623]/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute top-1/2 right-10 w-[350px] h-[350px] bg-[#EF4623]/5 rounded-full blur-[100px] pointer-events-none -z-10" />
 
       {/* Header */}
       <Header />
@@ -53,11 +54,11 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
       {/* Body with Sidebar & Viewport */}
       <div className="flex-1 flex overflow-hidden">
         {/* Glassy Sidebar Navigation */}
-        <aside className="w-64 border-r border-violet-500/15 bg-[#0B0916]/80 backdrop-blur-xl p-3.5 hidden md:flex flex-col justify-between flex-shrink-0">
+        <aside className="w-64 border-r border-[#2D3B42]/10 bg-white/70 backdrop-blur-xl p-3.5 hidden md:flex flex-col justify-between flex-shrink-0 shadow-[4px_0_24px_-2px_rgba(45,59,66,0.03)]">
           <div className="space-y-1.5">
-            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#2D3B42]/60 flex items-center justify-between">
               <span>Navigation</span>
-              <span className="font-mono text-[9px] text-violet-400">{currentUser.role.toUpperCase()}</span>
+              <span className="font-mono text-[9px] text-[#EF4623] font-bold">{currentUser.role.toUpperCase()}</span>
             </div>
 
             {visibleNavItems.map(item => {
@@ -66,14 +67,14 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all group ${
                     isActive
-                      ? 'bg-gradient-to-r from-violet-600/30 to-purple-600/20 text-violet-200 border border-violet-500/40 shadow-sm shadow-violet-500/20'
-                      : 'text-slate-400 hover:text-slate-100 hover:bg-white/5 border border-transparent'
+                      ? 'bg-[#EF4623]/10 text-[#EF4623] border border-[#EF4623]/30 shadow-sm shadow-[#EF4623]/10 font-bold'
+                      : 'text-[#2D3B42]/70 hover:text-[#2D3B42] hover:bg-white/80 border border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <span className={isActive ? 'text-violet-400' : 'text-slate-400 group-hover:text-violet-300'}>
+                    <span className={isActive ? 'text-[#EF4623]' : 'text-[#2D3B42]/60 group-hover:text-[#EF4623]'}>
                       {item.icon}
                     </span>
                     <span>{item.label}</span>
@@ -82,10 +83,10 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
                   {item.badge && (
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold font-mono ${
                       isActive 
-                        ? 'bg-violet-500 text-white' 
+                        ? 'bg-[#EF4623] text-white shadow-sm shadow-[#EF4623]/30' 
                         : item.id === 'approvals'
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                          : 'bg-white/5 text-slate-400 border border-white/5'
+                          ? 'bg-amber-500/15 text-amber-700 border border-amber-500/30'
+                          : 'bg-[#2D3B42]/5 text-[#2D3B42]/70 border border-[#2D3B42]/10'
                     }`}>
                       {item.badge}
                     </span>
@@ -96,25 +97,25 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
           </div>
 
           {/* Bottom Card / System Spec Info */}
-          <div className="p-3.5 rounded-2xl bg-gradient-to-b from-[#141029] to-[#0D0B18] border border-violet-500/20 text-xs space-y-2">
-            <div className="flex items-center gap-2 text-violet-300 font-bold text-[11px]">
-              <Sparkles className="w-3.5 h-3.5 text-violet-400" />
-              <span>Spec 1.0 Compliant</span>
+          <div className="p-3.5 rounded-3xl bg-white/85 border border-[#2D3B42]/10 shadow-sm text-xs space-y-2">
+            <div className="flex items-center gap-2 text-[#EF4623] font-bold text-[11px]">
+              <Sparkles className="w-3.5 h-3.5 text-[#EF4623]" />
+              <span className="font-serif italic text-sm">Spec 1.0 Compliant</span>
             </div>
-            <p className="text-[11px] text-slate-400 leading-relaxed">
+            <p className="text-[11px] text-[#2D3B42]/70 leading-relaxed">
               Active Directory LDAP login • Max 2-turn clarify limit • Static Approver Routing • Full Audit Trail.
             </p>
           </div>
         </aside>
 
         {/* Mobile Navigation Bar */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0B0916]/95 border-t border-violet-500/20 backdrop-blur-xl flex justify-around p-2">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 border-t border-[#2D3B42]/10 backdrop-blur-xl flex justify-around p-2">
           {visibleNavItems.slice(0, 5).map(item => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`p-2 rounded-xl flex flex-col items-center gap-1 text-[10px] font-medium ${
-                activeTab === item.id ? 'text-violet-400' : 'text-slate-400'
+              className={`p-2 rounded-2xl flex flex-col items-center gap-1 text-[10px] font-medium ${
+                activeTab === item.id ? 'text-[#EF4623] font-bold' : 'text-[#2D3B42]/60'
               }`}
             >
               {item.icon}

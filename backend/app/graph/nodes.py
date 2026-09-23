@@ -1,3 +1,4 @@
+import os
 import time
 import random
 from typing import Dict, Any, List
@@ -273,25 +274,98 @@ def tool_execution_node(state: Dict[str, Any]) -> Dict[str, Any]:
     tool_name = state.get("tool_name", "create_ticket")
     query = state.get("current_query", "")
     messages = list(state.get("messages", []))
+    jira_base_url = os.getenv("JIRA_INSTANCE_URL", "https://smithunpillai-1787661457265.atlassian.net").strip().rstrip("/")
+    ticket_ref = None
+    suggested_actions = []
 
     if tool_name == "check_ticket_status":
         content = "Here is the current status for **KAN-101** (JIRA):\n\n- **Title:** VPN connection timing out on home mesh network\n- **Status:** `In Progress`\n- **Priority:** `Medium`\n- **Reporter:** Alex Chen\n- **Assigned To:** Elena Rostova\n- **Last Updated:** Today at 11:30 AM"
+        ticket_ref = {
+            "id": "KAN-101",
+            "platform": "JIRA",
+            "title": "VPN connection timing out on home mesh network",
+            "description": "User reports GlobalProtect disconnects every 15 minutes when connected to eero mesh Wi-Fi.",
+            "status": "In Progress",
+            "priority": "Medium",
+            "category": "VPN & Network",
+            "createdBy": "alex.chen@corp.internal",
+            "createdByName": "Alex Chen",
+            "assignedTo": "elena.rostova@corp.internal",
+            "createdAt": "2026-08-24T09:15:00Z",
+            "updatedAt": "2026-08-25T08:30:00Z",
+            "externalUrl": f"{jira_base_url}/browse/KAN"
+        }
+        suggested_actions = [
+            {"label": "Open in JIRA Cloud", "action": "redirect_jira", "payload": ticket_ref},
+            {"label": "View in Service Desk Hub", "action": "view_ticket_hub", "payload": "KAN-101"},
+            {"label": "Escalate to Urgent", "action": "escalate_ticket", "payload": "KAN-101"}
+        ]
     elif tool_name == "escalate_ticket":
         content = "🚨 **Ticket Escalated**\n\nTicket **KAN-101** has been escalated to **Urgent** priority. The on-call Tier 2 engineering queue has been paged."
+        ticket_ref = {
+            "id": "KAN-101",
+            "platform": "JIRA",
+            "title": "VPN connection timing out on home mesh network",
+            "status": "In Progress",
+            "priority": "Urgent",
+            "category": "VPN & Network",
+            "createdBy": "alex.chen@corp.internal",
+            "externalUrl": f"{jira_base_url}/browse/KAN"
+        }
+        suggested_actions = [
+            {"label": "Open in JIRA Cloud", "action": "redirect_jira", "payload": ticket_ref},
+            {"label": "View in Service Desk Hub", "action": "view_ticket_hub", "payload": "KAN-101"}
+        ]
     elif tool_name == "close_ticket":
         content = "✅ **Ticket Closed**\n\nTicket **KAN-101** has been marked as **Resolved** in JIRA Sandbox with resolution notes."
+        ticket_ref = {
+            "id": "KAN-101",
+            "platform": "JIRA",
+            "title": "VPN connection timing out on home mesh network",
+            "status": "Resolved",
+            "priority": "Medium",
+            "category": "VPN & Network",
+            "createdBy": "alex.chen@corp.internal",
+            "externalUrl": f"{jira_base_url}/browse/KAN"
+        }
+        suggested_actions = [
+            {"label": "View in Service Desk Hub", "action": "view_ticket_hub", "payload": "KAN-101"}
+        ]
     else:
         ticket_id = f"KAN-{random.randint(105, 199)}"
         content = f"🎫 **Ticket Created Successfully**\n\nI have opened a new ticket **{ticket_id}** on **JIRA Cloud** and assigned it to the Tier 1 IT Service Desk queue.\n\nYou will receive real-time email and Slack notifications when an engineer is assigned."
+        ticket_ref = {
+            "id": ticket_id,
+            "platform": "JIRA",
+            "title": query[:50] if query else "IT Service Desk Request",
+            "description": query or "Created via HelpDeskGenie turn",
+            "status": "Open",
+            "priority": "Medium",
+            "category": "General IT",
+            "createdBy": state.get("user_id", "alex.chen@corp.internal"),
+            "createdAt": time.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "externalUrl": f"{jira_base_url}/browse/KAN"
+        }
+        suggested_actions = [
+            {"label": "Open in JIRA Cloud", "action": "redirect_jira", "payload": ticket_ref},
+            {"label": "View in Service Desk Hub", "action": "view_ticket_hub", "payload": ticket_id},
+            {"label": "Escalate to Urgent", "action": "escalate_ticket", "payload": ticket_id}
+        ]
 
     messages.append({
         "sender": "assistant",
         "content": content,
+        "ticket_ref": ticket_ref,
+        "ticketRef": ticket_ref,
+        "suggested_actions": suggested_actions,
+        "suggestedActions": suggested_actions,
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ")
     })
 
     return {
         "messages": messages,
+        "ticket_ref": ticket_ref,
+        "ticketRef": ticket_ref,
         "current_node": "tool_execution"
     }
 
@@ -305,15 +379,33 @@ def clarify_escalate_node(state: Dict[str, Any]) -> Dict[str, Any]:
     if turns > 2:
         ticket_id = f"INC00{random.randint(90000, 99999)}"
         content = f"🧑‍💼 **Escalated to Human Support Queue**\n\nI couldn't find a high-confidence answer in our verified Knowledge Base for your specific request after {turns} attempts. To prevent guesswork, I have transferred your session with complete context to our **Tier-1 Live IT Support Team** (Ticket: **{ticket_id}**).\n\nA human engineer will review your conversation logs and assist you shortly."
+        escalation_ticket = {
+            "id": ticket_id,
+            "platform": "ServiceNow",
+            "title": f"Live Agent Escalation: {state.get('current_query', '')[:40]}...",
+            "status": "Open",
+            "priority": "High",
+            "category": "Tier-1-LiveSupport",
+            "createdBy": state.get("user_id", "alex.chen@corp.internal"),
+            "externalUrl": f"https://servicenow.corp.internal/nav_to.do?uri=incident.do?sys_id={ticket_id}"
+        }
         messages.append({
             "sender": "assistant",
             "content": content,
             "is_escalated": True,
             "isEscalated": True,
+            "ticket_ref": escalation_ticket,
+            "ticketRef": escalation_ticket,
+            "suggested_actions": [
+                {"label": "Open in ServiceNow", "action": "redirect_servicenow", "payload": escalation_ticket},
+                {"label": "View in Service Desk Hub", "action": "view_ticket_hub", "payload": ticket_id}
+            ],
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ")
         })
         return {
             "messages": messages,
+            "ticket_ref": escalation_ticket,
+            "ticketRef": escalation_ticket,
             "clarifying_turn_count": turns,
             "current_node": "human_handoff"
         }
